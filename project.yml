@@ -1,0 +1,91 @@
+# XcodeGen spec. Regenerate the Xcode project with:  xcodegen generate
+name: ShiftDrop
+
+options:
+  bundleIdPrefix: com.saatviksharma
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    # Free distribution: ad-hoc signing, no team, no hardened runtime.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+    # Universal binary so Intel Macs work too.
+    ARCHS: "arm64 x86_64"
+    SWIFT_STRICT_CONCURRENCY: complete
+  configs:
+    Debug:
+      ONLY_ACTIVE_ARCH: YES
+    Release:
+      ONLY_ACTIVE_ARCH: NO
+
+packages:
+  WebP:
+    url: https://github.com/ainame/Swift-WebP
+    from: "0.5.0"
+
+targets:
+  ShiftDrop:
+    type: application
+    platform: macOS
+    sources:
+      - path: ShiftDrop
+    dependencies:
+      - package: WebP
+        product: WebP
+    info:
+      path: ShiftDrop/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: ShiftDrop
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSUIElement: true                # menu-bar only, no Dock icon
+        LSMinimumSystemVersion: "14.0"
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "© 2026 Saatvik Sharma. MIT License."
+        NSPrincipalClass: NSApplication
+    entitlements:
+      path: ShiftDrop/Resources/ShiftDrop.entitlements
+      properties: {}                     # not sandboxed, nothing to declare
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.saatviksharma.shiftdrop
+        PRODUCT_NAME: ShiftDrop
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+
+  ShiftDropTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: ShiftDropTests
+      - path: Fixtures
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: ShiftDrop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.saatviksharma.shiftdrop.tests
+
+schemes:
+  ShiftDrop:
+    build:
+      targets:
+        ShiftDrop: all
+        ShiftDropTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ShiftDropTests
+    archive:
+      config: Release
